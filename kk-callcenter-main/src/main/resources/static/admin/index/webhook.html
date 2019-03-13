@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html class="iframe-h">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"/>
+    <title>回调管理中心</title>
+    <link rel="stylesheet" type="text/css" href="../../static/admin/layui/css/layui.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/admin/css/admin.css"/>
+</head>
+<body class="iframe-h">
+<div class="wrap-container email-wrap clearfix">
+    <div class="tool-bar">
+        备注名：
+        <div class="layui-inline">
+            <input class="layui-input" name="memo" type="text" id="search-memo" autocomplete="off">
+        </div>
+        <button class="layui-btn" id="search-btn" data-type="reload">搜索</button>
+        <button class="layui-btn" id="refresh-btn" style="float: right">刷新页面</button>
+        <button class="layui-btn" id="add-btn" style="float: right">新增webhook</button>
+    </div>
+    <table class="layui-hide" id="table_webhook" lay-filter="demo"></table>
+</div>
+
+<form class="layui-form" id="add-form" method="post" lay-filter="add-form">
+    <div class="layui-form-item" style="margin-top: 20px;">
+        <label class="layui-form-label">url：</label>
+        <div class="layui-input-block">
+            <input type="text" name="url" id="url" style="width: 860px;" placeholder="请输入url" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">请求方式：</label>
+        <div class="layui-input-block" id="requst-method">
+            <input type="radio" name="method-radio" value="POST" title="POST" checked="">
+            <input type="radio" name="method-radio" value="GET" title="GET" disabled="disabled">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">请求类型：</label>
+        <div class="layui-input-block" style="width: 300px;">
+            <select id="content-type">
+                <option value="application/json; charset=utf-8" selected="">application/json</option>
+                <option value="application/x-www-form-urlencoded; charset=utf-8">application/x-www-form-urlencoded</option>
+                <option value="text/xml; charset=utf-8">text/xml</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备注：</label>
+        <div class="layui-input-block">
+            <input type="text" name="memo" id="memo" style="width: 400px;" placeholder="请输入备注" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">内容：</label>
+        <div class="layui-input-block">
+            <textarea rows="12" name="content" id="content" style="width: 860px;" placeholder="请输入内容" class="layui-textarea"></textarea>
+        </div>
+    </div>
+
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">内容说明：</label>
+        <div class="layui-input-block">
+            <span>${taskId}：回调任务id；${url}：回调url; </span><br>
+            <span>${createTime}：任务创建时间；${lastModifiedDate}：最近回调时间；</span><br>
+            <span>${sourceAppName}：源服务名；${targetAppName}：目标服务名；</span><br>
+            <span>${callCount}：已重试次数；${limitCallCount}：限制最大重试次数；</span>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" onclick="save()">确认</button>
+        </div>
+    </div>
+</form>
+<!--操作列-->
+<script type="text/html" id="optBar">
+    <a class="layui-btn layui-btn layui-btn-xs" lay-event="test">测试</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+<script src="../../static/admin/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="../../static/admin/lib/ueditor/third-party/jquery-1.10.2.min.js" type="text/javascript"
+        charset="utf-8"></script>
+<script>
+    layui.use(['table', 'form'], function () {
+        var table = layui.table;
+        var form = layui.form;
+        table.render({
+            elem: '#table_webhook'
+            , url: '/manager/getWebHookList'
+            , method: 'get'
+            , cols: [[
+                {field: 'url', title: 'url', width: 860}
+                , {field: 'requestMethod', title: '请求方式', width: 90}
+                , {field: 'memo', title: '备注', width: 180}
+                , {field: 'content', title: '内容'}
+                , {field: '', title: '操作', align: 'center', toolbar: "#optBar", width: 120}
+            ]]
+            , page: true
+            , id: 'table_webhook'
+            , parseData: function (res) {
+                return {
+                    "code": res.code,
+                    "msg": res.msg,
+                    "count": res.data.count,
+                    "data": res.data.resultList
+                };
+            }
+        });
+
+        var $ = layui.$, active = {
+            reload: function () {
+                var memo = $('#search-memo');
+                //执行重载
+                table.reload('table_webhook', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    , where: {
+                        memo: memo.val()
+                    }
+                });
+            }
+        };
+
+        //表单初始赋值
+        form.val('add-form', {
+            "content": "{\"msgtype\":\"text\",\"text\":{\"content\":\"回调异常，taskId：${taskId}，url：${url}，发起时间：${createTime}，源服务名：${sourceAppName}，目标服务名：${targetAppName}，已达到最大重试次数：${limitCallCount}\"}}"
+        })
+
+        $('#search-btn').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        $('#refresh-btn').on('click', function () {
+            var memo = $('#search-memo');
+            memo.val('');
+            table.reload('table_webhook', {
+                page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+                , where: {
+                    memo: memo.val()
+                }
+            });
+        })
+
+        $('#add-btn').on('click', function () {
+            layer.open({
+                type: 1,
+                title: "新增webhook"
+                , area: ['1000px', '680']
+                , id: 'toAdd' //防止重复弹出
+                , content: $('#add-form')
+                , btnAlign: 'c' //按钮居中
+                , shade: 0.1 //不显示遮罩
+                , yes: function () {
+                    layer.closeAll();
+                }
+            });
+        });
+
+        //监听工具条
+        table.on('tool(demo)', function(obj){
+            var data = obj.data;
+            var memo = $('#search-memo');
+            memo.val('');
+            if (obj.event === 'del') {
+                $.post("/manager/deleteWebHookById",
+                    {
+                        id: data.id
+                    },
+                    function(data){
+                        var msg = data == true ? "删除成功" : "删除失败";
+                        layer.alert(msg);
+                        table.reload('table_webhook', {
+                            page: {
+                                curr: 1 //重新从第 1 页开始
+                            }
+                            , where: {
+                                memo: memo.val()
+                            }
+                        });
+                    });
+            } else if (obj.event === 'test') {
+                $.post("/manager/testWebHook",
+                    {
+                        id: data.id
+                    },
+                    function(data){
+                        var msg = data == true ? "测试发送成功" : "测试发送失败";
+                        layer.alert(msg);
+                        table.reload('table_webhook', {
+                            page: {
+                                curr: 1 //重新从第 1 页开始
+                            }
+                            , where: {
+                                memo: memo.val()
+                            }
+                        });
+                    });
+            }
+        });
+    });
+
+    function save() {
+        var url = $("#url").val();
+        var requstMethod = $('#requst-method input[name="method-radio"]:checked ').val()
+        var contentType = $("#content-type").val();
+        var memo = $("#memo").val();
+        var content = $("#content").val();
+
+        if (url.trim() == "" || requstMethod.trim() == "" || contentType.trim() == "" || memo.trim() == "" || content.trim() == "") {
+            parent.layer.msg("表单不完整");
+            return;
+        }
+
+        var data = {
+            "url": url,
+            "requestMethod": requstMethod,
+            "contentType": contentType,
+            "memo": memo,
+            "content": content
+        };
+
+
+        $.ajax({
+            url: "/manager/saveWebHook",
+            type: "POST",
+            data: JSON.stringify(data),
+            dataType: "json",
+            contentType: 'application/json',
+            success: function (data) {
+                if (data == true) {
+                    var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+                    parent.layer.close(index);  // 关闭layer
+                    parent.layer.msg("新增成功", {icon: 6});
+                    parent.location.reload();
+                } else {
+                    parent.layer.msg("新增失败", {icon: 5});
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>

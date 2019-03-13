@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"/>
+    <title>回调管理中心后台</title>
+    <link rel="stylesheet" type="text/css" href="../../static/admin/layui/css/layui.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/admin/css/admin.css"/>
+</head>
+<body>
+<div class="wrap-container welcome-container">
+    <div class="row">
+        <div class="welcome-left-container col-lg-12">
+            <div class="data-show">
+                <ul class="clearfix">
+                    <li class="col-sm-12 col-md-4 col-xs-12">
+                        <a href="javascript:;" class="clearfix">
+                            <div class="icon-bg bg-org f-l">
+                                <span class="iconfont">&#xe83c;</span>
+                            </div>
+                            <div class="right-text-con">
+                                <p class="name">总回调次数</p>
+                                <p><span class="color-org" id="total-count">0</span></p>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="col-sm-12 col-md-4 col-xs-12">
+                        <a href="javascript:;" class="clearfix">
+                            <div class="icon-bg bg-blue f-l">
+                                <span class="iconfont">&#xe631;</span>
+                            </div>
+                            <div class="right-text-con">
+                                <p class="name">回调成功次数</p>
+                                <p><span class="color-blue" id="success-count">0</span></p>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="col-sm-12 col-md-4 col-xs-12">
+                        <a href="javascript:;" class="clearfix">
+                            <div class="icon-bg bg-green f-l">
+                                <span class="iconfont">&#xe610;</span>
+                            </div>
+                            <div class="right-text-con">
+                                <p class="name">回调失败次数</p>
+                                <p><span class="color-green" id="failed-count">0</span></p>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <!--图表-->
+            <div class="chart-panel panel panel-default">
+                <div class="panel-body" id="chart" style="height: 540px;">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../../static/admin/lib/jquery-1.10.2.min.js" type="text/javascript"></script>
+<script src="../../static/admin/layui/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="../../static/admin/lib/echarts/echarts-all.js"></script>
+<script type="text/javascript">
+    var myChart;
+
+    //获取当前时间，格式YYYY-MM-DD
+    function getNowFormatDate(reduceDays) {
+        var date = new Date();
+        date.setDate(date.getDate() - reduceDays);
+        var seperator1 = "-";
+        var year = date.getFullYear();
+        var month = date.getMonth() + 1;
+        var strDate = date.getDate();
+        if (month >= 1 && month <= 9) {
+            month = "0" + month;
+        }
+        if (strDate >= 0 && strDate <= 9) {
+            strDate = "0" + strDate;
+        }
+        var currentdate = year + seperator1 + month + seperator1 + strDate;
+        return currentdate;
+    }
+
+    function getDateArray() {
+        var dateArray = new Array()
+        for (var i = 6; i >= 0; i--) {
+            dateArray.push(getNowFormatDate(i))
+        }
+        return dateArray;
+    }
+
+    $(document).ready(function () {
+        myChart = echarts.init(document.getElementById('chart'));
+        $.get("/manager/getCount", function (data) {
+            $('#total-count').html(data.totalCount)
+            $('#success-count').html(data.successCount);
+            $('#failed-count').html(data.failedCount);
+        });
+        myChart.showLoading();
+        $.get("/manager/getCountForChart").done(function (data) {
+
+            var dateArray = getDateArray();
+            var chartData = data;
+            var charDataSuccess = new Array();
+            var charDataFailed = new Array();
+            var charDataTotal = new Array();
+            for (date in dateArray) {
+                charDataSuccess.push(typeof (chartData[dateArray[date]]) == "undefined" ? 0 : chartData[dateArray[date]].successCount);
+                charDataFailed.push(typeof (chartData[dateArray[date]]) == "undefined" ? 0 : chartData[dateArray[date]].failedCount);
+                charDataTotal.push(typeof (chartData[dateArray[date]]) == "undefined" ? 0 : chartData[dateArray[date]].totalCount);
+            }
+            var options = {
+                title: {
+                    text: "数据统计",
+                    textStyle: {
+                        color: "rgb(85, 85, 85)",
+                        fontSize: 18,
+                        fontStyle: "normal",
+                        fontWeight: "normal"
+                    }
+                },
+                tooltip: {
+                    trigger: "axis"
+                },
+                legend: {
+                    data: ["成功", "失败", "总次数"],
+                    selectedMode: false,
+                },
+                toolbox: {
+                    show: true,
+                    feature: {
+                        dataView: {
+                            show: false,
+                            readOnly: true
+                        },
+                        magicType: {
+                            show: false,
+                            type: ["line", "bar", "stack", "tiled"]
+                        },
+                        restore: {
+                            show: true
+                        },
+                        saveAsImage: {
+                            show: true
+                        },
+                        mark: {
+                            show: false
+                        }
+                    }
+                },
+                calculable: false,
+                xAxis: [
+                    {
+                        type: "category",
+                        boundaryGap: false,
+                        data: dateArray
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: "value"
+                    }
+                ],
+                grid: {
+                    x2: 30,
+                    x: 50
+                },
+                series: [
+                    {
+                        name: "失败",
+                        type: "line",
+                        smooth: true,
+                        itemStyle: {
+                            normal: {
+                                areaStyle: {
+                                    type: "default"
+                                }
+                            }
+                        },
+                        data: charDataFailed
+                    },
+                    {
+                        name: "成功",
+                        type: "line",
+                        smooth: true,
+                        itemStyle: {
+                            normal: {
+                                areaStyle: {
+                                    type: "default"
+                                }
+                            }
+                        },
+                        data: charDataSuccess
+                    },
+                    {
+                        name: "总次数",
+                        type: "line",
+                        smooth: true,
+                        itemStyle: {
+                            normal: {
+                                areaStyle: {
+                                    type: "default"
+                                },
+                                color: "rgb(110, 211, 199)"
+                            }
+                        },
+                        data: charDataTotal
+                    }
+                ]
+            }
+            myChart.setOption(options);
+            myChart.hideLoading();
+            $(window).resize(function () {
+                myChart.resize();
+            })
+        });
+    });
+</script>
+</body>
+</html>

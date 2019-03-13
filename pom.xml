@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>cn.keking.callcenter</groupId>
+    <artifactId>kk-callcenter</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <modules>
+        <module>kk-callcenter-sdk</module>
+        <module>kk-callcenter-main</module>
+        <module>third-party</module>
+    </modules>
+    <packaging>pom</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <callcenter.version>1.0.0-SNAPSHOT</callcenter.version>
+        <java.version>1.8</java.version>
+    </properties>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.0.0.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <distributionManagement>
+        <repository>
+            <id>repo</id>
+            <name>User Project Releases</name>
+            <url>http://ops.keking.cn:8081/nexus/content/repositories/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>repo</id>
+            <name>User Project SNAPSHOTS</name>
+            <url>http://ops.keking.cn:8081/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+
+</project>
