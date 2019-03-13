@@ -9,7 +9,7 @@ mysql新建一个数据库callcenterdb
 
 分别配置kk-callcenter-main模块中的 application.properties 配置文件的```spring.datasource``` 及 ```spring.redis``` 开头的配置即可
 
-##使用方法
+## 使用方法
 从github拉取代码
 ```
 git clone https://github.com/kekingcn/kkbida
