@@ -17,7 +17,7 @@ git clone https://github.com/kekingcn/kkbida
 使用maven构建
 ```
 cd kkbida
-mvn clean install -DskipTest
+mvn clean install -DskipTests
 ```
 运行
 ```
