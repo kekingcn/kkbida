@@ -10,7 +10,6 @@
     <modules>
         <module>kk-callcenter-sdk</module>
         <module>kk-callcenter-main</module>
-        <module>third-party</module>
     </modules>
     <packaging>pom</packaging>
 
