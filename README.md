@@ -28,7 +28,16 @@ java -jar kk-callcenter-main-1.0.0-SNAPSHOT.jar
 
 
 ## 注意事项
-此项目使用了凯京科技另一个开源组件klock( https://gitee.com/kekingcn/spring-boot-klock-starter )，jar包依赖在third-party模块中
+此项目使用了凯京科技另一个开源组件klock( https://gitee.com/kekingcn/spring-boot-klock-starter ) 
+
+maven依赖
+```xml
+<dependency>
+    <groupId>cn.keking</groupId>
+    <artifactId>spring-boot-klock-starter</artifactId>
+    <version>1.1-RELEASE</version>
+</dependency>
+```
 
 ## 系统架构
 通过阻塞队列来抗并发，通过延迟队列来处理失败的消息，并辅以控制台手动处理消息来保证消息最终送达。在使用方面，考虑到最小化改造和易用性，提供dubbo和http的sdk客户端
