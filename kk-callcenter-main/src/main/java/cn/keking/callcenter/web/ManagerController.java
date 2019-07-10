@@ -1,6 +1,7 @@
 package cn.keking.callcenter.web;
 
 import cn.keking.callcenter.model.ResultVO;
+import cn.keking.callcenter.model.entity.CallBackLogPO;
 import cn.keking.callcenter.model.entity.CallBackTaskPO;
 import cn.keking.callcenter.model.entity.WebHookPO;
 import cn.keking.callcenter.service.ManagerService;
@@ -133,6 +134,17 @@ public class ManagerController {
     }
 
     /**
+     * 待执行的任务
+     * @return
+     */
+    @PostMapping("/getTaskLogs")
+    @ResponseBody
+    public ResultVO getTaskLog(@RequestParam Map<String, String> map) {
+        PageUtil<CallBackLogPO> data = managerService.getTaskLog(map);
+        return ResultVO.putSuccess(data);
+    }
+
+    /**
      * 手动重试
      * @return
      */
@@ -198,4 +210,5 @@ public class ManagerController {
     public boolean testWebHook(@RequestParam(value = "id") Integer id) {
         return managerService.testWebHook(id);
     }
+
 }

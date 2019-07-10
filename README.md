@@ -22,7 +22,7 @@ mvn clean install -DskipTests
 运行
 ```
 cd kkbida/kk-callcenter-main/target
-java -jar kk-callcenter-main-1.0.0-SNAPSHOT.jar
+java -jar kk-callcenter-main-1.0.0.jar
 ```
 浏览器访问 http://127.0.0.1:8080 即可 用户名/密码：admin/admin
 
@@ -35,7 +35,7 @@ maven依赖
 <dependency>
     <groupId>cn.keking</groupId>
     <artifactId>spring-boot-klock-starter</artifactId>
-    <version>1.1-RELEASE</version>
+    <version>1.3-RELEASE</version>
 </dependency>
 ```
 
@@ -47,17 +47,17 @@ maven依赖
 ## SDK使用方法
 ### maven引入sdk
 ```
-        <dependency>
-            <groupId>cn.keking.callcenter</groupId>
-            <artifactId>kk-callcenter-sdk</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-        </dependency>
+<dependency>
+    <groupId>cn.keking.callcenter</groupId>
+    <artifactId>kk-callcenter-sdk</artifactId>
+    <version>1.0.0</version>
+</dependency>
 ```
 ### 获取CallBackService对象
 #### dubbo方式
 ```
-    @Reference(version = "1.0")
-    private CallBackService callBackService;
+@Reference(version = "1.0")
+private CallBackService callBackService;
     
 ```
 
@@ -66,37 +66,37 @@ maven依赖
 推荐获取方式如下(也可以直接new)
 ps：如果通过http客户端sdk调用，需要先申请配置白名单
 ```
-    @Value("${callBack.BaseUrl}")
-    private String callBackBaseUrl; //回调中心http调用url
-    @Value("${callBack.UserName}") 
-    private String callBackUserName; //回调中心帐号
-    @Value("${callBack.PassWord}")
-    private String callBackPassWord; //回调中心密码
-    
-    @Bean
-    public CallBackService callBackService(){
-        CallBackServiceHttpImpl callBackServiceHttp = new CallBackServiceHttpImpl(callBackBaseUrl,callBackUserName,callBackPassWord);
-        return callBackServiceHttp;
-    }
-    
-    @Autowired
-    private CallBackService callBackService;
+@Value("${callBack.BaseUrl}")
+private String callBackBaseUrl; //回调中心http调用url
+@Value("${callBack.UserName}") 
+private String callBackUserName; //回调中心帐号
+@Value("${callBack.PassWord}")
+private String callBackPassWord; //回调中心密码
+
+@Bean
+public CallBackService callBackService(){
+    CallBackServiceHttpImpl callBackServiceHttp = new CallBackServiceHttpImpl(callBackBaseUrl,callBackUserName,callBackPassWord);
+    return callBackServiceHttp;
+}
+
+@Autowired
+private CallBackService callBackService;
 ```
 
 ### 调用CallBackService发起回调
 ```
-    Map<String, Object> paramMap = new HashMap<>();
-    paramMap.put("city", "上海");
-    
-    CallBackTask task= new CallBackTask();
-    task.setUrl("https://www.apiopen.top/weatherApi"); //回调url（必填）
-    task.setRequestMethod(RequestMethodEnum.GET); //请求方式（必填）
-    task.setLimitCallCount(3); //重试次数限制（必填）
-    task.setExpectResult("成功"); //期待返回结果（必填），用于验证回调是否成功
-    task.setSourceAppName("xxx"); //发起发应用名（选填）
-    task.setTargetAppName("yyy"); //目标方应用名（选填）
-    task.setRequestParam(paramMap); //调用参数(选填)
-    String result = callBackService.call(task);
+Map<String, Object> paramMap = new HashMap<>();
+paramMap.put("city", "上海");
+
+CallBackTask task= new CallBackTask();
+task.setUrl("https://www.apiopen.top/weatherApi"); //回调url（必填）
+task.setRequestMethod(RequestMethodEnum.GET); //请求方式（必填）
+task.setLimitCallCount(3); //重试次数限制（必填）
+task.setExpectResult("成功"); //期待返回结果（必填），用于验证回调是否成功
+task.setSourceAppName("xxx"); //发起发应用名（选填）
+task.setTargetAppName("yyy"); //目标方应用名（选填）
+task.setRequestParam(paramMap); //调用参数(选填)
+String result = callBackService.call(task);
 ```
 ### 回调发起返回结果说明
 调用callBackService.call(task)发起成功则返回一个uuid为taskId，后续可以通过这个taskId查询回调任务详情，示例:'3e41bc91-0707-4b3a-a562-3aec4ed35815';  发起失败会抛出CallBackException异常

@@ -122,14 +122,14 @@ public class TaskService {
                 default:
                     break;
             }
-            if (HttpStatus.OK.equals(httpStatus) && httpResponseStr.contains(callBackTaskPO.getExpectResult())) {
+            if (HttpStatus.OK.equals(httpStatus) && httpResponseStr != null && httpResponseStr.contains(callBackTaskPO.getExpectResult())) {
                 execResult = true;
             }
         } catch (Exception e) {
             logger.error("回调异常", e);
             httpResponseStr = e.getLocalizedMessage();
         }
-        if (httpResponseStr.length() > Constants.MAX_RESPONSE_LENTHG) {
+        if (httpResponseStr != null && httpResponseStr.length() > Constants.MAX_RESPONSE_LENTHG) {
             logger.warn("响应结果过长，已自动截取");
             httpResponseStr = httpResponseStr.substring(0, Constants.MAX_RESPONSE_LENTHG);
         }
@@ -141,7 +141,7 @@ public class TaskService {
         callBackLogPO.setResponseTxt(httpResponseStr);
         callBackLogPO.setSuccess(execResult);
         callBackLogRepository.save(callBackLogPO);
-        logger.info("任务处理完成，结果:{}，重试次数:{}，任务详情:{}", execResult,callBackTaskPO.getCallCount(), JSON.toJSON(callBackTaskPO));
+        logger.info("任务处理完成，结果:{}，重试次数:{}，任务详情:{}，响应结果:{}", execResult,callBackTaskPO.getCallCount(), JSON.toJSON(callBackTaskPO), httpResponseStr);
         return execResult;
     }
 
