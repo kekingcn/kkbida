@@ -35,7 +35,7 @@ maven依赖
 <dependency>
     <groupId>cn.keking</groupId>
     <artifactId>spring-boot-klock-starter</artifactId>
-    <version>1.1-RELEASE</version>
+    <version>1.3-RELEASE</version>
 </dependency>
 ```
 
