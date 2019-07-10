@@ -14,7 +14,12 @@
 		<div class="demoTable">
 			url：
 			<div class="layui-inline">
-				<input class="layui-input" name="url" type="text" id="search-url" autocomplete="off" style="width: 400px;">
+				<input class="layui-input" name="url" type="text" id="search-url" autocomplete="off" style="width: 200px;">
+			</div>
+			&nbsp;&nbsp;&nbsp;&nbsp;
+			taskId：
+			<div class="layui-inline">
+				<input class="layui-input" name="url" type="text" id="search-taskId" autocomplete="off" style="width: 310px;">
 			</div>
 			&nbsp;&nbsp;&nbsp;&nbsp;
 			创建时间：
@@ -42,6 +47,7 @@
 				,method:'post'
                 ,cols: [[
                     {field:'url',title: 'url'}
+                    ,{field:'taskId',title: 'taskId', width: 90}
                     ,{field:'requestMethod',title: '请求方式', width: 90}
                     ,{field:'requestParam', title: '请求参数'
                         ,templet: function(item){
@@ -49,10 +55,14 @@
                         }
                     }
                     ,{field:'sourceIp',title: '请求IP', width: 120}
-                    ,{field:'success',title: '是否成功', width: 90}
+                    ,{field:'success',title: '是否成功', width: 90
+                        ,templet: function(item){
+                            return item.success ? '是':'否'
+                        }
+                    }
                     ,{field:'callCount',title: '重试次数', width: 90}
                     ,{field:'limitCallCount',title: '限制次数', width: 90}
-                    ,{field:'createDate',title: '创建时间', width: 160}
+                    ,{field:'createDate',title: '创建时间', width: 170}
                     ,{title: '操作', toolbar: '#barDemo', width: 100}
                 ]]
 				,id: 'LAY_table_fulltask'
@@ -69,6 +79,7 @@
             var $ = layui.$, active = {
                 reload: function(){
                     var url = $('#search-url');
+                    var taskId = $('#search-taskId');
 					var createTime = $('#search-createTime');
                     //执行重载
                     table.reload('LAY_table_fulltask', {
@@ -77,6 +88,7 @@
                         }
                         ,where: {
                             url: url.val()
+							,taskId: taskId.val()
 							,createTime: createTime.val()
                         }
                     });
@@ -89,8 +101,10 @@
 
             $('#refresh-btn').on('click', function () {
                 var url = $('#search-url');
+				var taskId = $('#search-taskId');
                 var createTime = $('#search-createTime');
                 url.val('');
+				taskId.val('');
 				createTime.val('');
                 table.reload('LAY_table_fulltask', {
                     page: {
@@ -98,6 +112,7 @@
                     }
                     ,where: {
                         url: url.val()
+						,taskId: taskId.val()
 						,createTime: createTime.val()
                     }
                 });
@@ -108,6 +123,7 @@
                 var data = obj.data;
                 if(obj.event === 'resend') {
                     var url = $('#search-url');
+					var taskId = $('#search-taskId');
 					var createTime = $('#search-createTime');
                     $.post("/manager/retry",
 					{
@@ -118,6 +134,7 @@
                         table.reload('LAY_table_fulltask', {
                                 where: {
                                     url: url.val()
+									,taskId: taskId.val()
 									,createTime: createTime.val()
                                 }
                             }

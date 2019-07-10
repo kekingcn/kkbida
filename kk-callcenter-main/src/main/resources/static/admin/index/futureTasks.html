@@ -16,6 +16,11 @@
         <div class="layui-inline">
             <input class="layui-input" name="url" id="search-url" autocomplete="off" style="width: 400px;">
         </div>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        taskId：
+        <div class="layui-inline">
+            <input class="layui-input" name="url" id="search-taskId" autocomplete="off" style="width: 430px;">
+        </div>
         <button class="layui-btn" data-type="reload">搜索</button>
         <button class="layui-btn" id="refresh-btn" style="float: right">刷新页面</button>
     </div>
@@ -34,6 +39,7 @@
             ,method:'post'
             ,cols: [[
                 {field:'url',title: 'url'}
+                ,{field:'taskId',title: 'taskId', width: 90}
                 ,{field:'requestMethod',title: '请求方式', width: 90}
                 ,{field:'requestParam', title: '请求参数'
                     ,templet: function(item){
@@ -41,10 +47,14 @@
                     }
                 }
                 ,{field:'sourceIp',title: '请求IP', width: 120}
-                ,{field:'success',title: '是否成功', width: 90}
+                ,{field:'success',title: '是否成功', width: 90
+                    ,templet: function(item){
+                        return item.success ? '是':'否'
+                    }
+                }
                 ,{field:'callCount',title: '重试次数', width: 90}
                 ,{field:'limitCallCount',title: '限制次数', width: 90}
-                ,{field:'createDate',title: '创建时间', width: 160}
+                ,{field:'createDate',title: '创建时间', width: 170}
                 ,{field:'expireTime',title: '剩余时间', width: 90}
                 ,{title: '操作', toolbar: '#barDemo', width: 100}
             ]]
@@ -63,6 +73,7 @@
         var $ = layui.$, active = {
             reload: function(){
                 var url = $('#search-url');
+                var taskId = $('#search-taskId');
                 //执行重载
                 table.reload('LAY_table_futuretask', {
                     page: {
@@ -70,6 +81,7 @@
                     }
                     ,where: {
                         url: url.val()
+                        ,taskId: taskId.val()
                     }
                 });
             }
@@ -81,14 +93,17 @@
         });
 
         $('#refresh-btn').on('click', function () {
-            url = $('#search-url');
-            url.val('')
+            var url = $('#search-url');
+            var taskId = $('#search-taskId');
+            url.val('');
+            taskId.val('');
             table.reload('LAY_table_futuretask', {
                 page: {
                     curr: 1 //重新从第 1 页开始
                 }
                 ,where: {
                     url: url.val()
+                    ,taskId: taskId.val()
                 }
             });
         })
@@ -98,6 +113,7 @@
             var data = obj.data;
             if(obj.event === 'resend') {
                 var url = $('#search-url');
+                var taskId = $('#search-taskId');
                 $.post("/manager/retry",
                     {
                         taskId: data.taskId
@@ -107,6 +123,7 @@
                         table.reload('LAY_table_futuretask', {
                                 where: {
                                     url: url.val()
+                                    ,taskId: taskId.val()
                                 }
                             }
                         );

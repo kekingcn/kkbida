@@ -39,11 +39,12 @@ public class ManagerService {
     @Autowired
     private WebHookRepository webHookRepository;
 
-    @Autowired
-    private TaskService taskService;
 
     @Autowired
     private WebHookClientComponent webHookClientComponent;
+
+    @Autowired
+    private TaskService taskService;
 
     public PageUtil<CallBackTaskPO> getFullTask(Map<String, String> map) {
         return queryComponet.getFullTask(map);
@@ -163,6 +164,10 @@ public class ManagerService {
         List<Map<String, Object>> list = callBackLogRepository.getCountForChart();
         list.forEach(item -> resultMap.put(item.get("date").toString(), item));
         return resultMap;
+    }
+
+    public PageUtil<CallBackLogPO> getTaskLog(Map<String, String> map) {
+        return queryComponet.getTaskLog(map);
     }
 
     class GetTotalCountThread implements Callable<Integer> {

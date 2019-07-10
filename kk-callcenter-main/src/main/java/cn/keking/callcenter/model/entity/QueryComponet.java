@@ -3,6 +3,7 @@ package cn.keking.callcenter.model.entity;
 import cn.keking.callcenter.utils.PageUtil;
 import com.querydsl.jpa.JPAQueryBase;
 import com.querydsl.jpa.impl.JPAQuery;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -30,6 +31,8 @@ public class QueryComponet {
 
     private QWebHookPO qWebHookPO = QWebHookPO.webHookPO;
 
+    private QCallBackLogPO qCallBackLogPO = QCallBackLogPO.callBackLogPO;
+
     public PageUtil<CallBackTaskPO> getFullTask(Map<String, String> map) {
         int currentPage = 1;
         int rows = 10;
@@ -55,8 +58,11 @@ public class QueryComponet {
 
 
         JPAQueryBase queryBase = new JPAQuery<CallBackTaskPO>(entityManager).from(qCallBackTaskPO);
-        if (map.get("url") != null) {
+        if (map.get("url") != null && StringUtils.isNotBlank(map.get("url"))) {
             queryBase.where(qCallBackTaskPO.url.contains(map.get("url")));
+        }
+        if (map.get("taskId") != null && StringUtils.isNotBlank(map.get("taskId"))) {
+            queryBase.where(qCallBackTaskPO.taskId.eq(map.get("taskId")));
         }
         if ((startTime != null) && (endTime != null)) {
             queryBase.where(qCallBackTaskPO.createDate.between(startTime, endTime));
@@ -85,8 +91,11 @@ public class QueryComponet {
         } catch (Exception e) {}
 
         JPAQueryBase queryBase = new JPAQuery<CallBackTaskPO>(entityManager).from(qCallBackTaskPO);
-        if (map.get("url") != null) {
+        if (map.get("url") != null && StringUtils.isNotBlank(map.get("url"))) {
             queryBase.where(qCallBackTaskPO.url.contains(map.get("url")));
+        }
+        if (map.get("taskId") != null && StringUtils.isNotBlank(map.get("taskId"))) {
+            queryBase.where(qCallBackTaskPO.taskId.eq(map.get("taskId")));
         }
         queryBase.where(qCallBackTaskPO.expireTimestamp.isNotNull());
         queryBase.orderBy(qCallBackTaskPO.createDate.desc());
@@ -134,5 +143,31 @@ public class QueryComponet {
             remainSeconds = (expireTimeMillis - currentTimeMillis) / 1000;
         } catch (Exception e) {}
         return remainSeconds + "秒";
+    }
+
+    public PageUtil<CallBackLogPO> getTaskLog(Map<String, String> map) {
+        int currentPage = 1;
+        int rows = 10;
+        try {
+            if (map.get("page") != null) {
+                currentPage = Integer.parseInt(map.get("page"));
+            }
+            if (map.get("limit") != null) {
+                rows = Integer.parseInt(map.get("limit"));
+            }
+        } catch (Exception e) {}
+
+        JPAQueryBase queryBase = new JPAQuery<CallBackTaskPO>(entityManager).from(qCallBackLogPO);
+        if (map.get("taskId") != null && StringUtils.isNotBlank(map.get("taskId"))) {
+            queryBase.where(qCallBackLogPO.taskId.eq(map.get("taskId")));
+        }
+        queryBase.orderBy(qCallBackLogPO.createDate.desc());
+        long count = queryBase.fetchCount();
+        PageUtil<CallBackLogPO> page = new PageUtil<>(currentPage, rows);
+        page.setCount(count);
+        queryBase.limit(page.getRows()).offset((page.getCurrentPage() - 1) * page.getRows());
+        List<CallBackLogPO> list = queryBase.fetch();
+        page.setResultList(list == null ? new ArrayList<>() : list);
+        return page;
     }
 }
