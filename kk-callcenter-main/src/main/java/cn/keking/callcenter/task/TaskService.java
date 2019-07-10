@@ -141,7 +141,7 @@ public class TaskService {
         callBackLogPO.setResponseTxt(httpResponseStr);
         callBackLogPO.setSuccess(execResult);
         callBackLogRepository.save(callBackLogPO);
-        logger.info("任务处理完成，结果:{}，重试次数:{}，任务详情:{}", execResult,callBackTaskPO.getCallCount(), JSON.toJSON(callBackTaskPO));
+        logger.info("任务处理完成，结果:{}，重试次数:{}，任务详情:{}，响应结果:{}", execResult,callBackTaskPO.getCallCount(), JSON.toJSON(callBackTaskPO), httpResponseStr);
         return execResult;
     }
 
