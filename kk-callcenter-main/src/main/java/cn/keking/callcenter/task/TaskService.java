@@ -134,6 +134,9 @@ public class TaskService {
             httpResponseStr = httpResponseStr.substring(0, Constants.MAX_RESPONSE_LENTHG);
         }
         callBackTaskPO.setSuccess(execResult);
+        if(execResult) {
+            callBackTaskPO.setExpireTimestamp(null);
+        }
         callBackTaskRepository.save(callBackTaskPO);
 
         CallBackLogPO callBackLogPO = new CallBackLogPO();

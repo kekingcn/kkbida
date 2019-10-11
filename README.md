@@ -22,7 +22,7 @@ mvn clean install -DskipTests
 运行
 ```
 cd kkbida/kk-callcenter-main/target
-java -jar kk-callcenter-main-1.0.0.jar
+java -jar kk-callcenter-main-1.0.1.jar
 ```
 浏览器访问 http://127.0.0.1:8080 即可 用户名/密码：admin/admin
 
@@ -50,7 +50,7 @@ maven依赖
 <dependency>
     <groupId>cn.keking.callcenter</groupId>
     <artifactId>kk-callcenter-sdk</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 ### 获取CallBackService对象
