@@ -6,7 +6,7 @@
 
     <groupId>cn.keking.callcenter</groupId>
     <artifactId>kk-callcenter</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <modules>
         <module>kk-callcenter-sdk</module>
         <module>kk-callcenter-main</module>
@@ -15,7 +15,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <callcenter.version>1.0.0</callcenter.version>
+        <callcenter.version>1.0.1</callcenter.version>
         <java.version>1.8</java.version>
     </properties>
 
